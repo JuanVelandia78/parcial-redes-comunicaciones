@@ -1,0 +1,30 @@
+# 06 - Peticion HTTP de nginx a joomla capturada en br-frontend
+# Muestra el saludo TCP (SYN, SYN-ACK, ACK), las cabeceras que inyecta Nginx y el cierre (FIN).
+
+$ tcpdump -i br-frontend -nn -A 'tcp port 80 and host 172.20.0.4'
+07:38:23.356367 IP 172.20.0.5.35934 > 172.20.0.4.80: Flags [S], seq 3932166695, win 64240, options [mss 1460,sackOK,TS val 2158594998 ecr 0,nop,wscale 9], length 0
+07:38:23.356391 IP 172.20.0.4.80 > 172.20.0.5.35934: Flags [S.], seq 2538275130, ack 3932166696, win 65160, options [mss 1460,sackOK,TS val 559890348 ecr 2158594998,nop,wscale 9], length 0
+07:38:23.356406 IP 172.20.0.5.35934 > 172.20.0.4.80: Flags [.], ack 1, win 126, options [nop,nop,TS val 2158594998 ecr 559890348], length 0
+07:38:23.356435 IP 172.20.0.5.35934 > 172.20.0.4.80: Flags [P.], seq 1:251, ack 1, win 126, options [nop,nop,TS val 2158594998 ecr 559890348], length 250: HTTP: GET /index.php?option=com_content&view=article&id=1 HTTP/1.1
+        ....!_?.GET /index.php?option=com_content&view=article&id=1 HTTP/1.1
+        Host: localhost
+        X-Real-IP: 172.20.0.1
+        X-Forwarded-For: 172.20.0.1
+        X-Forwarded-Proto: http
+        X-Forwarded-Host: localhost
+        Connection: close
+        User-Agent: evidencia-informe
+07:38:23.356531 IP 172.20.0.4.80 > 172.20.0.5.35934: Flags [.], ack 251, win 127, options [nop,nop,TS val 559890348 ecr 2158594998], length 0
+07:38:23.558713 IP 172.20.0.4.80 > 172.20.0.5.35934: Flags [P.], seq 1:7241, ack 251, win 127, options [nop,nop,TS val 559890550 ecr 2158594998], length 7240: HTTP: HTTP/1.1 200 OK
+        !_@v....HTTP/1.1 200 OK
+        Server: Apache/2.4.68 (Debian)
+        Connection: close
+        Content-Type: text/html; charset=utf-8
+07:38:23.558811 IP 172.20.0.5.35934 > 172.20.0.4.80: Flags [.], ack 7241, win 155, options [nop,nop,TS val 2158595200 ecr 559890550], length 0
+07:38:23.558825 IP 172.20.0.4.80 > 172.20.0.5.35934: Flags [P.], seq 7241:12291, ack 251, win 127, options [nop,nop,TS val 559890550 ecr 2158594998], length 5050: HTTP
+07:38:23.558835 IP 172.20.0.5.35934 > 172.20.0.4.80: Flags [.], ack 12291, win 175, options [nop,nop,TS val 2158595200 ecr 559890550], length 0
+07:38:23.567752 IP 172.20.0.4.80 > 172.20.0.5.35934: Flags [P.], seq 12291:12296, ack 251, win 127, options [nop,nop,TS val 559890559 ecr 2158595200], length 5: HTTP
+07:38:23.567849 IP 172.20.0.5.35934 > 172.20.0.4.80: Flags [.], ack 12296, win 175, options [nop,nop,TS val 2158595209 ecr 559890559], length 0
+07:38:23.568000 IP 172.20.0.4.80 > 172.20.0.5.35934: Flags [F.], seq 12296, ack 251, win 127, options [nop,nop,TS val 559890559 ecr 2158595209], length 0
+07:38:23.568165 IP 172.20.0.5.35934 > 172.20.0.4.80: Flags [F.], seq 251, ack 12297, win 175, options [nop,nop,TS val 2158595209 ecr 559890559], length 0
+07:38:23.568196 IP 172.20.0.4.80 > 172.20.0.5.35934: Flags [.], ack 252, win 127, options [nop,nop,TS val 559890559 ecr 2158595209], length 0

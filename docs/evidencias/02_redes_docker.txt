@@ -1,0 +1,21 @@
+# 02 - Redes Docker: subred, gateway, IP y MAC de cada contenedor
+
+$ docker network inspect parcial_frontend_net
+Red: parcial_frontend_net  Driver: bridge  Internal: false
+Subred: 172.20.0.0/24  Gateway: 172.20.0.1
+Bridge: br-frontend
+Contenedores:
+  jupyter   172.20.0.2/24  MAC 36:0b:81:d4:33:57
+  grafana   172.20.0.3/24  MAC e2:9d:89:45:dc:f2
+  joomla    172.20.0.4/24  MAC b6:2d:64:1d:25:91
+  nginx     172.20.0.5/24  MAC 6e:b8:b6:2c:c8:1a
+
+$ docker network inspect parcial_backend_net
+Red: parcial_backend_net  Driver: bridge  Internal: true
+Subred: 172.21.0.0/24  Gateway: 172.21.0.1
+Bridge: br-backend
+Contenedores:
+  jupyter   172.21.0.3/24  MAC 7a:73:20:c9:87:83
+  grafana   172.21.0.4/24  MAC 0e:33:58:77:f0:43
+  database  172.21.0.2/24  MAC ba:47:81:b9:0b:f1
+  joomla    172.21.0.5/24  MAC 7a:47:9e:77:79:e3

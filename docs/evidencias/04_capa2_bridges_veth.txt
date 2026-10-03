@@ -1,0 +1,44 @@
+# 04 - Capa 2 en el host: puentes br-*, interfaces veth y su pareja en cada contenedor
+
+$ ip -br link show type bridge
+docker0          DOWN           aa:1c:88:51:e2:25 <NO-CARRIER,BROADCAST,MULTICAST,UP> 
+br-backend       UP             42:ca:ca:c1:3e:f9 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+br-frontend      UP             56:ff:dc:42:0a:dc <BROADCAST,MULTICAST,UP,LOWER_UP> 
+
+$ ip -br addr show br-frontend
+br-frontend      UP             172.20.0.1/24 fe80::54ff:dcff:fe42:adc/64 
+
+$ ip -br addr show br-backend
+br-backend       UP             172.21.0.1/24 fe80::40ca:caff:fec1:3ef9/64 
+
+$ bridge link show
+41: veth61c627e@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br-backend state forwarding priority 32 cost 2 
+42: veth42b18c6@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br-frontend state forwarding priority 32 cost 2 
+43: veth0e47b42@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br-backend state forwarding priority 32 cost 2 
+46: veth9419f60@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br-backend state forwarding priority 32 cost 2 
+47: vetha346944@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br-frontend state forwarding priority 32 cost 2 
+48: vetheed792f@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br-frontend state forwarding priority 32 cost 2 
+70: vethc1bbc0d@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br-frontend state forwarding priority 32 cost 2 
+71: veth97393e2@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br-backend state forwarding priority 32 cost 2 
+
+$ brctl show
+bridge name	bridge id		STP enabled	interfaces
+br-backend		8000.42cacac13ef9	no		veth0e47b42
+							veth61c627e
+							veth9419f60
+							veth97393e2
+br-frontend		8000.56ffdc420adc	no		veth42b18c6
+							vetha346944
+							vethc1bbc0d
+							vetheed792f
+docker0		8000.aa1c8851e225	no		
+
+# Pareja veth de cada interfaz de contenedor (iflink del contenedor = ifindex en el host)
+  nginx     eth0  <-> vetheed792f      (ifindex 48) conectado a br-frontend
+  joomla    eth0  <-> veth9419f60      (ifindex 46) conectado a br-backend
+  joomla    eth1  <-> vetha346944      (ifindex 47) conectado a br-frontend
+  database  eth0  <-> veth61c627e      (ifindex 41) conectado a br-backend
+  jupyter   eth0  <-> veth42b18c6      (ifindex 42) conectado a br-frontend
+  jupyter   eth1  <-> veth0e47b42      (ifindex 43) conectado a br-backend
+  grafana   eth0  <-> vethc1bbc0d      (ifindex 70) conectado a br-frontend
+  grafana   eth1  <-> veth97393e2      (ifindex 71) conectado a br-backend

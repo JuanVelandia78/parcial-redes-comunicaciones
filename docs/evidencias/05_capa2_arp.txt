@@ -1,0 +1,28 @@
+# 05 - Resolucion ARP entre nginx (172.20.0.5) y joomla (172.20.0.4) en br-frontend
+# Se vacia la cache ARP de nginx, se captura en el puente y se genera una peticion.
+
+$ ip neigh flush all (en el namespace de nginx)
+
+$ tcpdump -i br-frontend -nn -e arp
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on br-frontend, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+07:38:09.158703 6e:b8:b6:2c:c8:1a > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42: Request who-has 172.20.0.1 tell 172.20.0.5, length 28
+07:38:09.158724 56:ff:dc:42:0a:dc > 6e:b8:b6:2c:c8:1a, ethertype ARP (0x0806), length 42: Reply 172.20.0.1 is-at 56:ff:dc:42:0a:dc, length 28
+07:38:09.159847 6e:b8:b6:2c:c8:1a > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42: Request who-has 172.20.0.4 tell 172.20.0.5, length 28
+07:38:09.159878 b6:2d:64:1d:25:91 > 6e:b8:b6:2c:c8:1a, ethertype ARP (0x0806), length 42: Reply 172.20.0.4 is-at b6:2d:64:1d:25:91, length 28
+07:38:14.443649 56:ff:dc:42:0a:dc > e2:9d:89:45:dc:f2, ethertype ARP (0x0806), length 42: Request who-has 172.20.0.3 tell 172.20.0.1, length 28
+07:38:14.443672 56:ff:dc:42:0a:dc > 6e:b8:b6:2c:c8:1a, ethertype ARP (0x0806), length 42: Request who-has 172.20.0.5 tell 172.20.0.1, length 28
+07:38:14.443763 b6:2d:64:1d:25:91 > 6e:b8:b6:2c:c8:1a, ethertype ARP (0x0806), length 42: Request who-has 172.20.0.5 tell 172.20.0.4, length 28
+07:38:14.443771 e2:9d:89:45:dc:f2 > 56:ff:dc:42:0a:dc, ethertype ARP (0x0806), length 42: Request who-has 172.20.0.1 tell 172.20.0.3, length 28
+07:38:14.443773 e2:9d:89:45:dc:f2 > 56:ff:dc:42:0a:dc, ethertype ARP (0x0806), length 42: Reply 172.20.0.3 is-at e2:9d:89:45:dc:f2, length 28
+07:38:14.443782 56:ff:dc:42:0a:dc > e2:9d:89:45:dc:f2, ethertype ARP (0x0806), length 42: Reply 172.20.0.1 is-at 56:ff:dc:42:0a:dc, length 28
+07:38:14.443784 6e:b8:b6:2c:c8:1a > 56:ff:dc:42:0a:dc, ethertype ARP (0x0806), length 42: Reply 172.20.0.5 is-at 6e:b8:b6:2c:c8:1a, length 28
+07:38:14.443791 6e:b8:b6:2c:c8:1a > b6:2d:64:1d:25:91, ethertype ARP (0x0806), length 42: Reply 172.20.0.5 is-at 6e:b8:b6:2c:c8:1a, length 28
+
+12 packets captured
+12 packets received by filter
+0 packets dropped by kernel
+
+$ ip neigh (tabla ARP de nginx despues de la peticion)
+172.20.0.1 dev eth0 lladdr 56:ff:dc:42:0a:dc REACHABLE 
+172.20.0.4 dev eth0 lladdr b6:2d:64:1d:25:91 REACHABLE 

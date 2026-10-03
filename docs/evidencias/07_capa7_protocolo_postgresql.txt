@@ -1,0 +1,32 @@
+# 07 - Protocolo de PostgreSQL (TCP 5432) capturado en br-backend
+# Jupyter abre una conexion nueva: StartupMessage (user/database), SCRAM-SHA-256, consulta y respuesta.
+articulos = 3
+
+$ tcpdump -i br-backend -nn -A 'tcp port 5432'
+07:38:36.697127 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [S], seq 2703191926, win 64240, options [mss 1460,sackOK,TS val 4187498003 ecr 0,nop,wscale 9], len
+07:38:36.697424 IP 172.21.0.2.5432 > 172.21.0.3.46178: Flags [S.], seq 3613009614, ack 2703191927, win 65160, options [mss 1460,sackOK,TS val 245824127 ecr 4187
+07:38:36.697449 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [.], ack 1, win 126, options [nop,nop,TS val 4187498004 ecr 245824127], length 0
+07:38:36.697509 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [P.], seq 1:9, ack 1, win 126, options [nop,nop,TS val 4187498004 ecr 245824127], length 8
+07:38:36.697518 IP 172.21.0.2.5432 > 172.21.0.3.46178: Flags [.], ack 9, win 128, options [nop,nop,TS val 245824128 ecr 4187498004], length 0
+07:38:36.698753 IP 172.21.0.2.5432 > 172.21.0.3.46178: Flags [P.], seq 1:2, ack 9, win 128, options [nop,nop,TS val 245824129 ecr 4187498004], length 1
+07:38:36.699091 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [.], ack 2, win 126, options [nop,nop,TS val 4187498005 ecr 245824129], length 0
+07:38:36.699233 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [P.], seq 9:89, ack 2, win 126, options [nop,nop,TS val 4187498005 ecr 245824129], length 80
+..&........P....user.joomla_user.database.joomla_db.application_name.evidencia-informe..
+07:38:36.700759 IP 172.21.0.2.5432 > 172.21.0.3.46178: Flags [P.], seq 2:26, ack 89, win 128, options [nop,nop,TS val 245824131 ecr 4187498005], length 24
+SCRAM-SHA-256..
+07:38:36.703376 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [P.], seq 89:144, ack 26, win 126, options [nop,nop,TS val 4187498010 ecr 245824131], length 55
+..&.....p...6SCRAM-SHA-256.... n,,n=,r=dbu+0qejsSlEJoUVP44obzD1
+07:38:36.703994 IP 172.21.0.2.5432 > 172.21.0.3.46178: Flags [P.], seq 26:119, ack 144, win 128, options [nop,nop,TS val 245824134 ecr 4187498010], length 93
+07:38:36.708724 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [P.], seq 144:253, ack 119, win 126, options [nop,nop,TS val 4187498015 ecr 245824134], length 109
+07:38:36.710975 IP 172.21.0.2.5432 > 172.21.0.3.46178: Flags [P.], seq 119:602, ack 253, win 128, options [nop,nop,TS val 245824141 ecr 4187498015], length 483
+......&.R...6....v=KBWuSrRAWd7/4v20/oTQPWby5wZpQ1QOVSsW8TOXbog=R........S....in_hot_standby.off.S....integer_datetimes.on.S....TimeZone.UTC.S....IntervalStyle.p
+07:38:36.711622 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [P.], seq 253:264, ack 602, win 126, options [nop,nop,TS val 4187498018 ecr 245824141], length 11
+07:38:36.711923 IP 172.21.0.2.5432 > 172.21.0.3.46178: Flags [P.], seq 602:619, ack 264, win 128, options [nop,nop,TS val 245824142 ecr 4187498018], length 17
+07:38:36.712143 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [P.], seq 264:302, ack 619, win 126, options [nop,nop,TS val 4187498018 ecr 245824142], length 38
+..&"....Q...%SELECT count(*) FROM jml_content.
+07:38:36.716191 IP 172.21.0.2.5432 > 172.21.0.3.46178: Flags [P.], seq 619:682, ack 302, win 128, options [nop,nop,TS val 245824146 ecr 4187498018], length 63
+......&"T......count...................D..........3C....SELECT 1.Z....T
+07:38:36.716544 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [P.], seq 302:307, ack 682, win 126, options [nop,nop,TS val 4187498023 ecr 245824146], length 5
+07:38:36.716650 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [F.], seq 307, ack 682, win 126, options [nop,nop,TS val 4187498023 ecr 245824146], length 0
+07:38:36.719811 IP 172.21.0.2.5432 > 172.21.0.3.46178: Flags [F.], seq 682, ack 308, win 128, options [nop,nop,TS val 245824150 ecr 4187498023], length 0
+07:38:36.719842 IP 172.21.0.3.46178 > 172.21.0.2.5432: Flags [.], ack 683, win 126, options [nop,nop,TS val 4187498026 ecr 245824150], length 0

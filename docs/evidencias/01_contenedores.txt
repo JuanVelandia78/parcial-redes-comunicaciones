@@ -1,0 +1,9 @@
+# 01 - Contenedores, imagenes y puertos publicados
+
+$ docker compose ps
+NAME       IMAGE                        STATUS                    PORTS
+database   postgres:16-alpine           Up 15 minutes (healthy)   5432/tcp
+grafana    grafana/grafana:13.2.3       Up 23 seconds (healthy)   3000/tcp
+joomla     joomla:6.1.4-php8.4-apache   Up 15 minutes (healthy)   80/tcp
+jupyter    parcial-jupyter:1.1          Up 15 minutes (healthy)   8888/tcp
+nginx      nginx:1.31.6-alpine          Up 15 minutes (healthy)   0.0.0.0:80->80/tcp, [::]:80->80/tcp

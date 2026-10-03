@@ -1,0 +1,11 @@
+# 08 - HTTP Upgrade a WebSocket del kernel de Jupyter (a traves de Nginx)
+
+$ curl -i -N -H Connection: Upgrade -H Upgrade: websocket ... /jupyter/api/events/subscribe
+HTTP/1.1 101 Switching Protocols
+Server: nginx/1.31.6
+Date: Sat, 03 Oct 2026 07:38:49 GMT
+Connection: upgrade
+X-Content-Type-Options: nosniff
+Content-Security-Policy: frame-ancestors 'self'; report-uri /jupyter/api/security/csp-report
+Access-Control-Allow-Origin: 
+Upgrade: websocket

@@ -1,0 +1,21 @@
+# 13 - Resultado de verificar.sh
+== 1. Contenedores ==
+  [OK]    Los 5 servicios estan en ejecucion
+  [OK]    Ningun servicio esta unhealthy o arrancando
+  [OK]    Solo nginx publica puertos al host
+== 2. Enrutamiento por Nginx ==
+  [OK]    Joomla responde en /
+  [OK]    Jupyter responde en /jupyter/
+  [OK]    WebSocket de Jupyter (101 Switching Protocols)
+  [OK]    Grafana responde en /grafana/
+== 3. Precarga de Jupyter y Grafana ==
+  [OK]    Cuaderno analisis_datos.ipynb presente en Jupyter
+  [OK]    Dashboard aprovisionado en Grafana
+  [OK]    Grafana (usuario lector) lee el log de Nginx
+  [OK]    Grafana (usuario lector) lee las tablas de Joomla
+== 4. PostgreSQL y segmentacion ==
+  [OK]    Joomla creo sus tablas en PostgreSQL
+  [OK]    La base de datos NO tiene salida a internet
+  [OK]    El puerto 5432 NO esta publicado en el host
+
+Resultado: 14 correctas, 0 con fallo

@@ -1,0 +1,64 @@
+# 03 - Interfaces y tabla de rutas dentro de cada contenedor
+
+================ nginx ================
+$ ip -br addr
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0@if48        UP             172.20.0.5/24 
+
+$ ip route
+default via 172.20.0.1 dev eth0 
+172.20.0.0/24 dev eth0 proto kernel scope link src 172.20.0.5 
+
+eth0: ifindex=2 peer(iflink en el host)=48
+
+================ joomla ================
+$ ip -br addr
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0@if46        UP             172.21.0.5/24 
+eth1@if47        UP             172.20.0.4/24 
+
+$ ip route
+default via 172.20.0.1 dev eth1 
+172.20.0.0/24 dev eth1 proto kernel scope link src 172.20.0.4 
+172.21.0.0/24 dev eth0 proto kernel scope link src 172.21.0.5 
+
+eth0: ifindex=2 peer(iflink en el host)=46
+eth1: ifindex=3 peer(iflink en el host)=47
+
+================ database ================
+$ ip -br addr
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0@if41        UP             172.21.0.2/24 
+
+$ ip route
+172.21.0.0/24 dev eth0 proto kernel scope link src 172.21.0.2 
+
+eth0: ifindex=2 peer(iflink en el host)=41
+
+================ jupyter ================
+$ ip -br addr
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0@if42        UP             172.20.0.2/24 
+eth1@if43        UP             172.21.0.3/24 
+
+$ ip route
+default via 172.20.0.1 dev eth0 
+172.20.0.0/24 dev eth0 proto kernel scope link src 172.20.0.2 
+172.21.0.0/24 dev eth1 proto kernel scope link src 172.21.0.3 
+
+eth0: ifindex=2 peer(iflink en el host)=42
+eth1: ifindex=3 peer(iflink en el host)=43
+
+================ grafana ================
+$ ip -br addr
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0@if70        UP             172.20.0.3/24 
+eth1@if71        UP             172.21.0.4/24 
+
+$ ip route
+default via 172.20.0.1 dev eth0 
+172.20.0.0/24 dev eth0 proto kernel scope link src 172.20.0.3 
+172.21.0.0/24 dev eth1 proto kernel scope link src 172.21.0.4 
+
+eth0: ifindex=2 peer(iflink en el host)=70
+eth1: ifindex=3 peer(iflink en el host)=71
