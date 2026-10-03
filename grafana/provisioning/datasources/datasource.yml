@@ -1,0 +1,25 @@
+# ==========================================================
+#  Datasource aprovisionado automaticamente
+#  Grafana lo crea al arrancar (no se configura a mano)
+# ==========================================================
+apiVersion: 1
+
+datasources:
+  - name: PostgreSQL-Joomla
+    uid: pg-joomla
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: database:5432
+    user: ${GRAFANA_DB_USER}
+    isDefault: true
+    editable: false
+    jsonData:
+      database: ${POSTGRES_DB}
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+      maxOpenConns: 10
+      maxIdleConns: 5
+      connMaxLifetime: 14400
+    secureJsonData:
+      password: ${GRAFANA_DB_PASSWORD}

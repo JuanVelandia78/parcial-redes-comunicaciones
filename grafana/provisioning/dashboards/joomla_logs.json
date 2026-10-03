@@ -1,0 +1,252 @@
+{
+  "uid": "parcial-trafico",
+  "title": "Parcial II - Tráfico Nginx y actividad Joomla",
+  "description": "Dashboard aprovisionado automáticamente. Fuente: log de Nginx (file_fdw) y tablas de Joomla en PostgreSQL.",
+  "tags": ["parcial", "nginx", "joomla", "postgresql"],
+  "timezone": "browser",
+  "editable": false,
+  "graphTooltip": 1,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-6h", "to": "now" },
+  "annotations": { "list": [] },
+  "templating": {
+    "list": [
+      {
+        "name": "servicio",
+        "label": "Servicio",
+        "type": "custom",
+        "query": "joomla,jupyter,grafana",
+        "multi": true,
+        "includeAll": true,
+        "current": { "selected": true, "text": ["joomla"], "value": ["joomla"] },
+        "options": [
+          { "selected": false, "text": "All", "value": "$__all" },
+          { "selected": true, "text": "joomla", "value": "joomla" },
+          { "selected": false, "text": "jupyter", "value": "jupyter" },
+          { "selected": false, "text": "grafana", "value": "grafana" }
+        ]
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Resumen del tráfico HTTP",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 4 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) AS \"Peticiones\", count(*) FILTER (WHERE codigo >= 400) AS \"Errores 4xx/5xx\", count(DISTINCT ip) AS \"IPs únicas\", round(avg(tiempo) * 1000, 1) AS \"Tiempo medio (ms)\" FROM trafico_nginx WHERE $__timeFilter(fecha) AND servicio IN ($servicio)"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "vertical",
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "justifyMode": "center"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "blue" }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Errores 4xx/5xx" },
+            "properties": [ { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } } ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Volumen de peticiones por código HTTP (por minuto)",
+      "gridPos": { "x": 0, "y": 4, "w": 16, "h": 9 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(fecha, '1m'), codigo::text AS metric, count(*) AS valor FROM trafico_nginx WHERE $__timeFilter(fecha) AND servicio IN ($servicio) GROUP BY 1, 2 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "stacking": { "mode": "normal", "group": "A" }
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      }
+    },
+    {
+      "id": 3,
+      "type": "piechart",
+      "title": "Distribución por código HTTP",
+      "gridPos": { "x": 16, "y": 4, "w": 8, "h": 9 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT codigo::text AS \"Código\", count(*) AS \"Peticiones\" FROM trafico_nginx WHERE $__timeFilter(fecha) AND servicio IN ($servicio) GROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" } },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "pieType": "donut",
+        "displayLabels": ["percent"],
+        "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["value"] },
+        "tooltip": { "mode": "single", "sort": "none" }
+      }
+    },
+    {
+      "id": 4,
+      "type": "bargauge",
+      "title": "IPs cliente más recurrentes",
+      "gridPos": { "x": 0, "y": 13, "w": 8, "h": 9 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT host(ip) AS \"IP\", count(*) AS \"Peticiones\" FROM trafico_nginx WHERE $__timeFilter(fecha) AND servicio IN ($servicio) GROUP BY 1 ORDER BY 2 DESC LIMIT 10"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "continuous-BlPu" },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Actividad de usuarios en Joomla (action_logs)",
+      "gridPos": { "x": 8, "y": 13, "w": 16, "h": 9 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(log_date, '10m'), count(*) AS \"Acciones\" FROM jml_action_logs WHERE $__timeFilter(log_date) GROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "green" },
+          "custom": { "drawStyle": "bars", "fillOpacity": 70, "lineWidth": 1 },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      }
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Artículos de Joomla más visitados",
+      "gridPos": { "x": 0, "y": 22, "w": 10, "h": 9 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT title AS \"Artículo\", hits AS \"Visitas\", created AS \"Creado\" FROM jml_content WHERE state = 1 ORDER BY hits DESC LIMIT 10"
+        }
+      ],
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "options": { "showHeader": true, "cellHeight": "sm" }
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "Últimas peticiones registradas por Nginx",
+      "gridPos": { "x": 10, "y": 22, "w": 14, "h": 9 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "pg-joomla" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT fecha AS \"Fecha\", host(ip) AS \"IP\", metodo AS \"Método\", uri AS \"URI\", codigo AS \"Código\", servicio AS \"Servicio\", round(tiempo * 1000, 1) AS \"Tiempo (ms)\" FROM trafico_nginx WHERE $__timeFilter(fecha) AND servicio IN ($servicio) ORDER BY fecha DESC LIMIT 25"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Código" },
+            "properties": [
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+              { "id": "color", "value": { "mode": "thresholds" } },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "green", "value": null },
+                    { "color": "orange", "value": 300 },
+                    { "color": "red", "value": 400 }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": { "showHeader": true, "cellHeight": "sm" }
+    }
+  ]
+}
