@@ -7,15 +7,68 @@
 name: parcial
 
 services:
-  # --- Contenedor TEMPORAL solo para probar las redes ---
-  # Se elimina en la Parte 2
-  prueba:
-    image: alpine:latest
-    container_name: prueba
-    command: sleep infinity
+
+  # --------------------------------------------------------
+  # 3. Base de datos PostgreSQL (solo red interna)
+  # --------------------------------------------------------
+  database:
+    image: postgres:16-alpine
+    container_name: database
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # --------------------------------------------------------
+  # 2. CMS Joomla (frontend + backend)
+  # --------------------------------------------------------
+  joomla:
+    image: joomla:latest
+    container_name: joomla
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      # Conexion a PostgreSQL
+      JOOMLA_DB_TYPE: pgsql
+      JOOMLA_DB_HOST: database
+      JOOMLA_DB_NAME: ${POSTGRES_DB}
+      JOOMLA_DB_USER: ${POSTGRES_USER}
+      JOOMLA_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JOOMLA_DB_PREFIX: ${JOOMLA_DB_PREFIX}
+      # Instalacion automatica (sin asistente web)
+      JOOMLA_SITE_NAME: ${JOOMLA_SITE_NAME}
+      JOOMLA_ADMIN_USER: ${JOOMLA_ADMIN_USER}
+      JOOMLA_ADMIN_USERNAME: ${JOOMLA_ADMIN_USERNAME}
+      JOOMLA_ADMIN_PASSWORD: ${JOOMLA_ADMIN_PASSWORD}
+      JOOMLA_ADMIN_EMAIL: ${JOOMLA_ADMIN_EMAIL}
+    volumes:
+      - joomla_data:/var/www/html
     networks:
       - frontend_net
       - backend_net
+    # TEMPORAL: solo para probar en la Parte 2.
+    # Se elimina en la Parte 3 (solo Nginx publica puertos).
+    ports:
+      - "8080:80"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
 
 networks:
   frontend_net:
