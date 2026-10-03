@@ -12,7 +12,7 @@ services:
   # 1. Nginx - Proxy inverso (UNICO puerto publicado)
   # --------------------------------------------------------
   nginx:
-    image: nginx:alpine
+    image: nginx:1.31.6-alpine
     container_name: nginx
     restart: unless-stopped
     depends_on:
@@ -35,7 +35,7 @@ services:
   # 2. CMS Joomla (frontend + backend)
   # --------------------------------------------------------
   joomla:
-    image: joomla:latest
+    image: joomla:6.1.4-php8.4-apache
     container_name: joomla
     restart: unless-stopped
     depends_on:
@@ -99,7 +99,7 @@ services:
   # --------------------------------------------------------
   jupyter:
     build: ./jupyter
-    image: parcial-jupyter:1.0
+    image: parcial-jupyter:1.1
     container_name: jupyter
     restart: unless-stopped
     depends_on:
@@ -131,7 +131,7 @@ services:
   # 5. Grafana - Monitoreo con provisioning automatico
   # --------------------------------------------------------
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:13.2.3
     container_name: grafana
     restart: unless-stopped
     depends_on:
