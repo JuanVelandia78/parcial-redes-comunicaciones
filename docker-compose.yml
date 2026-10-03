@@ -1,0 +1,37 @@
+# ==========================================================
+#  Parcial II - Comunicaciones
+#  Orquestacion de 5 servicios: nginx, joomla, database,
+#  jupyter y grafana
+# ==========================================================
+
+name: parcial
+
+services:
+  # --- Contenedor TEMPORAL solo para probar las redes ---
+  # Se elimina en la Parte 2
+  prueba:
+    image: alpine:latest
+    container_name: prueba
+    command: sleep infinity
+    networks:
+      - frontend_net
+      - backend_net
+
+networks:
+  frontend_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+  backend_net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+
+volumes:
+  db_data:
+  joomla_data:
+  grafana_data:

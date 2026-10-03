@@ -1,0 +1,10 @@
+# Variables reales (solo se sube .env.example)
+.env
+
+# Archivos temporales de Jupyter y Python
+.ipynb_checkpoints/
+__pycache__/
+
+# Configuracion de editores
+.vscode/
+*.swp
