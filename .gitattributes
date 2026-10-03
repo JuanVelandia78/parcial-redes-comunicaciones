@@ -1,0 +1,4 @@
+# Mantener saltos de linea Linux (LF) en cualquier sistema operativo.
+# Evita que Git en Windows convierta los scripts a CRLF y fallen dentro de los contenedores.
+* text=auto eol=lf
+*.png binary
