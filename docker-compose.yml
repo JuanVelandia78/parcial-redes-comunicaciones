@@ -109,7 +109,7 @@ services:
       start-notebook.py
       --ServerApp.base_url=/jupyter/
       --ServerApp.root_dir=/home/jovyan/work
-      --ServerApp.default_url=/lab/tree/analisis_datos.ipynb
+      --LabApp.default_url=/lab/tree/analisis_datos.ipynb
       --ServerApp.trust_xheaders=True
     environment:
       JUPYTER_TOKEN: ${JUPYTER_TOKEN}

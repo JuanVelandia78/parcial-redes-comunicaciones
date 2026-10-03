@@ -667,7 +667,7 @@ Resultado: 14 correctas, 0 con fallo
 
 ### 3.3 Ejecutar el cuaderno de Jupyter
 
-1. Abrir **http://localhost/jupyter/?token=parcial2026**. Se abre **directamente** `analisis_datos.ipynb` (`--ServerApp.default_url`). El token está definido en `.env` (`JUPYTER_TOKEN`).
+1. Abrir **http://localhost/jupyter/?token=parcial2026**. Se abre **directamente** `analisis_datos.ipynb` (`--LabApp.default_url`). El token está definido en `.env` (`JUPYTER_TOKEN`).
 2. Menú **Run → Restart Kernel and Run All Cells**. El indicador del kernel (arriba a la derecha) debe quedar en **Idle**, lo que confirma el WebSocket a través de Nginx.
 3. Resultados esperados:
 
