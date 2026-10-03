@@ -89,6 +89,39 @@ services:
       retries: 10
       start_period: 10s
 
+  # --------------------------------------------------------
+  # 4. Jupyter - Entorno de analisis de datos
+  # --------------------------------------------------------
+  jupyter:
+    build: ./jupyter
+    image: parcial-jupyter:1.0
+    container_name: jupyter
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    command: >
+      start-notebook.py
+      --ServerApp.base_url=/jupyter/
+      --ServerApp.root_dir=/home/jovyan/work
+      --ServerApp.default_url=/lab/tree/analisis_datos.ipynb
+      --ServerApp.trust_xheaders=True
+    environment:
+      JUPYTER_TOKEN: ${JUPYTER_TOKEN}
+      # Datos de conexion que usara el cuaderno
+      DB_HOST: database
+      DB_PORT: "5432"
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_PREFIX: ${JOOMLA_DB_PREFIX}
+    volumes:
+      - ./jupyter/notebooks:/home/jovyan/work
+      - nginx_logs:/home/jovyan/logs:ro
+    networks:
+      - frontend_net
+      - backend_net
+
 networks:
   frontend_net:
     driver: bridge
