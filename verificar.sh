@@ -48,6 +48,8 @@ check "Grafana (usuario lector) lee el log de Nginx" \
 check "Grafana (usuario lector) lee las tablas de Joomla" \
       'docker compose exec -T database sh -c '\''PGPASSWORD="$GRAFANA_DB_PASSWORD" psql -h localhost -U "$GRAFANA_DB_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM jml_content"'\'''
 
+check "Articulo inicial sembrado y visible en la portada"       'curl -fsS http://localhost/ | grep -q "images/parcial/culpa-de-abelardo.jpg" && curl -fsS -o /dev/null http://localhost/images/parcial/culpa-de-abelardo.jpg'
+
 echo "== 4. PostgreSQL y segmentacion =="
 check "Joomla creo sus tablas en PostgreSQL" \
       'docker compose exec -T database sh -c '\''psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT 1 FROM jml_users LIMIT 1"'\'' | grep -q 1'

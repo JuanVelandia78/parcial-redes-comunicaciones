@@ -94,6 +94,7 @@ flowchart TB
 | `./jupyter/notebooks` | bind-mount | `jupyter:/home/jovyan/work` | `analisis_datos.ipynb` |
 | `./grafana/provisioning` | bind-mount (ro) | `grafana:/etc/grafana/provisioning` | Datasource y dashboard declarativos |
 | `./database/init` | bind-mount (ro) | `database:/docker-entrypoint-initdb.d` | Script de inicialización de PostgreSQL |
+| `./joomla/seed` | bind-mount (ro) | `joomla:/seed` | Siembra del artículo inicial "Prueba" y su imagen |
 
 ### 1.3 Direccionamiento real ([evidencia 02](docs/evidencias/02_redes_docker.txt))
 
@@ -626,17 +627,18 @@ Se espera ver 5 servicios `(healthy)` y solo `nginx` con `0.0.0.0:80->80/tcp`.
   [OK]    Dashboard aprovisionado en Grafana
   [OK]    Grafana (usuario lector) lee el log de Nginx
   [OK]    Grafana (usuario lector) lee las tablas de Joomla
+  [OK]    Articulo inicial sembrado y visible en la portada
 == 4. PostgreSQL y segmentacion ==
   [OK]    Joomla creo sus tablas en PostgreSQL
   [OK]    La base de datos NO tiene salida a internet
   [OK]    El puerto 5432 NO esta publicado en el host
 
-Resultado: 14 correctas, 0 con fallo
+Resultado: 15 correctas, 0 con fallo
 ```
 
 ### 3.1 Abrir el portal Joomla a través de Nginx y generar tráfico
 
-1. Abrir **http://localhost/**. Aparece el sitio *Portal Academico Mecatronica*, ya instalado (sin asistente). La instalación es automática gracias a las variables `JOOMLA_SITE_NAME`, `JOOMLA_ADMIN_*` y `JOOMLA_DB_TYPE=pgsql`.
+1. Abrir **http://localhost/**. Aparece el sitio *Portal Academico Mecatronica*, ya instalado (sin asistente), con el artículo destacado **"Prueba"** y su imagen. La instalación es automática gracias a las variables `JOOMLA_SITE_NAME`, `JOOMLA_ADMIN_*` y `JOOMLA_DB_TYPE=pgsql`, y el artículo lo crea el script de siembra (ver 3.1.1).
 2. Entrar a **http://localhost/administrator** con usuario `admin` y contraseña `Admin_Joomla_2026`. El inicio de sesión queda registrado en `jml_action_logs`.
 3. Crear uno o dos artículos (*Content → Articles → New → Save & Close*) y visitarlos varias veces desde el sitio público.
 4. Visitar una URL inexistente, por ejemplo http://localhost/no-existe, para generar errores 404.
@@ -648,6 +650,21 @@ Resultado: 14 correctas, 0 con fallo
 ![Artículo de Joomla servido a través de Nginx](docs/capturas/joomla_articulo.png)
 
 *Figura 2. Artículo de Joomla servido a través de Nginx, con su contador de visitas (Hits: 65).*
+
+#### 3.1.1 Contenido inicial sembrado automáticamente
+
+Para que el portal no arranque vacío, el servicio `joomla` usa un entrypoint propio ([`joomla/seed/entrypoint-seed.sh`](joomla/seed/entrypoint-seed.sh)) que:
+
+1. Lanza en segundo plano [`joomla/seed/seed.php`](joomla/seed/seed.php) y luego ejecuta el **entrypoint oficial** de la imagen, sin modificar su comportamiento.
+2. `seed.php` espera a que termine la instalación automática (existe `configuration.php` y ya no existe `installation/`), se conecta a PostgreSQL con las mismas variables `JOOMLA_DB_*` y crea el artículo destacado **"Prueba"** con la imagen `images/parcial/culpa-de-abelardo.jpg`, servida localmente desde el repositorio.
+3. Replica lo que hace Joomla al guardar un artículo desde el panel, todo en una transacción: fila en `jml_content`, nodo en el árbol de permisos `jml_assets` (hijo de la categoría, actualizando `lft`/`rgt`), etapa en `jml_workflow_associations` y entrada en `jml_content_frontpage`.
+4. Es **idempotente**: si el artículo ya existe (por ejemplo, tras un reinicio), no hace nada.
+
+```
+joomla  | [seed] Articulo "Prueba" (id 1) creado con su imagen images/parcial/culpa-de-abelardo.jpg
+joomla  |  This server is now configured to run Joomla!
+joomla  | [seed] El articulo "prueba" ya existe; nada que sembrar.      ← tras reiniciar el contenedor
+```
 
 ### 3.2 Comprobar en Grafana que las gráficas reflejan el tráfico
 
@@ -687,7 +704,7 @@ Resultado: 14 correctas, 0 con fallo
 
 *Figura 3. Celda 8 del cuaderno: peticiones por código de estado HTTP y por servicio de destino, calculadas desde `trafico.csv`.*
 
-En un despliegue recién creado, sin artículos, las celdas 5 y 6 muestran un mensaje informativo en lugar de un error. El cuaderno está preparado para ese caso.
+En un despliegue recién creado, la celda 5 muestra el artículo sembrado "Prueba" y la celda 6 muestra un mensaje informativo hasta que haya actividad de usuarios (por ejemplo, un inicio de sesión en el administrador). El cuaderno está preparado para ese caso.
 
 ### 3.4 Regenerar las evidencias de red
 

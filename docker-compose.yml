@@ -37,6 +37,10 @@ services:
   joomla:
     image: joomla:6.1.4-php8.4-apache
     container_name: joomla
+    # Entrypoint propio: siembra el articulo inicial y luego
+    # ejecuta el entrypoint oficial de la imagen
+    entrypoint: ["/seed/entrypoint-seed.sh"]
+    command: ["apache2-foreground"]
     restart: unless-stopped
     depends_on:
       database:
@@ -57,6 +61,7 @@ services:
       JOOMLA_ADMIN_EMAIL: ${JOOMLA_ADMIN_EMAIL}
     volumes:
       - joomla_data:/var/www/html
+      - ./joomla/seed:/seed:ro
     networks:
       - frontend_net
       - backend_net

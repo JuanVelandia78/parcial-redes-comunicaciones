@@ -41,7 +41,7 @@ docker compose ps
 
 | Servicio | URL | Credenciales (definidas en `.env`) |
 |---|---|---|
-| Joomla (sitio) | http://localhost/ | — |
+| Joomla (sitio) | http://localhost/ | — (portada con el artículo inicial "Prueba") |
 | Joomla (administración) | http://localhost/administrator | `admin` / `Admin_Joomla_2026` |
 | Jupyter | http://localhost/jupyter/?token=parcial2026 | token `parcial2026` |
 | Grafana | http://localhost/grafana/ | Visible sin login. Para administrar: `admin` / `Admin_Grafana_2026` |
@@ -55,7 +55,7 @@ docker compose ps
 ./verificar.sh
 ```
 
-Comprueba los 14 puntos de la rúbrica: contenedores healthy, puerto único, enrutamiento, WebSocket (101), precarga de Jupyter y Grafana, PostgreSQL y aislamiento de `backend_net`.
+Comprueba 15 puntos de la rúbrica: contenedores healthy, puerto único, enrutamiento, WebSocket (101), precarga de Jupyter y Grafana, artículo inicial de Joomla, PostgreSQL y aislamiento de `backend_net`.
 
 Para regenerar las evidencias de red del informe (no requiere `sudo`):
 
@@ -94,6 +94,8 @@ parcial-redes-comunicaciones/
 │   └── default.conf                    # Proxy inverso, WebSocket, log CSV, DNS dinámico
 ├── database/
 │   └── init/01-trafico-nginx.sh        # file_fdw sobre el log + usuario lector para Grafana
+├── joomla/
+│   └── seed/                           # Siembra del artículo inicial "Prueba" con su imagen
 ├── jupyter/
 │   ├── Dockerfile                      # Base oficial + pandas, matplotlib, SQLAlchemy, psycopg2
 │   └── notebooks/analisis_datos.ipynb  # Cuaderno precargado

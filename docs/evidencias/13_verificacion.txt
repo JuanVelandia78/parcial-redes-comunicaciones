@@ -13,9 +13,10 @@
   [OK]    Dashboard aprovisionado en Grafana
   [OK]    Grafana (usuario lector) lee el log de Nginx
   [OK]    Grafana (usuario lector) lee las tablas de Joomla
+  [OK]    Articulo inicial sembrado y visible en la portada
 == 4. PostgreSQL y segmentacion ==
   [OK]    Joomla creo sus tablas en PostgreSQL
   [OK]    La base de datos NO tiene salida a internet
   [OK]    El puerto 5432 NO esta publicado en el host
 
-Resultado: 14 correctas, 0 con fallo
+Resultado: 15 correctas, 0 con fallo
