@@ -6,7 +6,7 @@
 |---|---|
 | **Asignatura** | Comunicaciones – Ingeniería Mecatrónica |
 | **Docente** | Ing. Andrés Julián Moreno M.Sc. |
-| **Integrante(s)** | Juan Velandia |
+| **Integrantes** | Juan Velandia · Valeria Talero · Santiago Cabezas |
 | **Repositorio** | https://github.com/JuanVelandia78/parcial-redes-comunicaciones |
 | **Entorno de pruebas** | Ubuntu 26.04.1 LTS (VirtualBox, 4 vCPU, 4 GB RAM) · Docker Engine con Compose v2 |
 
